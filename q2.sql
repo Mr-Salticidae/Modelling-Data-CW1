@@ -4,3 +4,5 @@ The query should return a table with a single column labeled "Advertisers" (text
 
 The query should not modify the database and be a single SQL statement. */
    
+SELECT count(*) AS Advertisers FROM advertiserInfo
+;

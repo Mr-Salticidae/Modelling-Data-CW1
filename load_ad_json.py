@@ -69,10 +69,10 @@ def populate_device_info(impression, cur):
     except:
         return None
     
-    deviceT_type = device_info['deviceType']
-    device_id += deviceT_type
+    device_type = device_info['deviceType']
+    device_id += device_type
     os_type = device_info['osType']
-    device_data = (os_type, device_id, deviceT_type)
+    device_data = (os_type, device_id, device_type)
     
     try:
         cur.execute('INSERT INTO deviceInfo VALUES(?, ?, ?)', device_data)
@@ -108,12 +108,18 @@ def populate_advertiser_info(impression, cur):
         return None
     
     screen_name = advertiser_info['screenName']
-    advertiser_data = (advertiser_name, screen_name)
     
     try:
+        advertiser_data = (advertiser_name, str([screen_name]))
         cur.execute('INSERT INTO advertiserInfo VALUES(?, ?)', advertiser_data)
     except:
-        pass
+        cur.execute('SELECT screenName FROM advertiserInfo WHERE advertiserName = ?', (advertiser_name,))
+        existing_screen_names = cur.fetchone()[0]
+        existing_screen_names = eval(existing_screen_names)
+        if screen_name not in existing_screen_names:
+            existing_screen_names.append(screen_name)
+            advertiser_data = (str(existing_screen_names), advertiser_name)
+            cur.execute('UPDATE advertiserInfo SET screenName = ? WHERE advertiserName = ?', advertiser_data)
     
     return advertiser_name
 
